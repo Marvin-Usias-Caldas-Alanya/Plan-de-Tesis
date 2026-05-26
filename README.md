@@ -1,5 +1,5 @@
 # NutriStore — Sistema Híbrido IA + Handoff Humano
-
+Proyecto integrado con SonarCloud para análisis de calidad de código.
 Aplicación web para el proyecto de tesis:
 
 **Desarrollo de un Sistema Híbrido con IA y Handoff Humano para la Gestión de Redes Sociales y Ventas en una Tienda de Suplementos Nutricionales**
