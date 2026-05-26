@@ -1,0 +1,47 @@
+{
+  "name": "suplementos-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Sistema híbrido con IA y handoff humano para gestión de redes sociales y ventas",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"docs/**/*.md\" \"*.{js,json,html,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\" \"docs/**/*.md\" \"*.{js,json,html,md}\"",
+    "sonar": "sonar-scanner",
+    "quality": "npm run lint && npm run test:coverage && npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.2",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.7",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "html-to-image": "^1.11.13",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.8.3",
+    "vite": "^8.0.12",
+    "vitest": "^4.1.7"
+  }
+}

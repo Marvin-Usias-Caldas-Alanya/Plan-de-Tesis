@@ -1,0 +1,26 @@
+.chat-input {
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--color-surface);
+}
+
+.chat-input__form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.chat-input__form .ui-input {
+  flex: 1;
+}
+
+.chat-input__form .ui-input__control {
+  padding: 0.55rem 0.85rem;
+}
+
+.chat-input__badge {
+  align-self: flex-start;
+}

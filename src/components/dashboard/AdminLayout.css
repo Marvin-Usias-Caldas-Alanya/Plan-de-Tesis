@@ -1,0 +1,50 @@
+.admin-shell {
+  display: flex;
+  gap: 0;
+  margin: -1rem -1.25rem 0;
+  min-height: calc(100vh - 120px);
+}
+
+.admin-shell__main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.25rem 1.5rem 2rem;
+}
+
+.admin-shell__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-layout__feedback {
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+
+.admin-layout__feedback .ui-alert {
+  padding-right: 2.5rem;
+}
+
+.admin-layout__feedback-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.admin-layout__feedback-close:hover {
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .admin-shell {
+    flex-direction: column;
+  }
+}

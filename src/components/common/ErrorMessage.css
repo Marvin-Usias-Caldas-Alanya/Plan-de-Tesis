@@ -1,0 +1,31 @@
+.ui-alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  border: 1px solid transparent;
+}
+
+.ui-alert--error {
+  background: var(--color-danger-muted);
+  color: #fca5a5;
+  border-color: rgb(239 68 68 / 0.35);
+}
+
+.ui-alert--success {
+  background: var(--color-success-muted);
+  color: #86efac;
+  border-color: rgb(34 197 94 / 0.35);
+}
+
+.ui-alert--info {
+  background: var(--color-info-muted);
+  color: #93c5fd;
+  border-color: rgb(59 130 246 / 0.35);
+}
+
+.ui-alert--warning {
+  background: var(--color-accent-muted);
+  color: #fdba74;
+  border-color: rgb(249 115 22 / 0.35);
+}

@@ -1,0 +1,15 @@
+/**
+ * Barrel de compatibilidad — preferir imports directos por dominio.
+ */
+export {
+  getAllProfiles,
+  getAllCustomers,
+  getAllSellers,
+  setProfileActive,
+  updateProfileRole as updateUserRole,
+  getCustomerIdByProfileId,
+  getSellerIdByProfileId,
+} from './profileService';
+
+export { getRoles } from './roleService';
+export { getSupportTickets } from './ticketService';

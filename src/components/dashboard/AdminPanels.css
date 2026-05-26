@@ -1,0 +1,142 @@
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-panel__form-card {
+  padding: 1.25rem;
+}
+
+.admin-panel__form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-panel__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.admin-panel__form input,
+.admin-panel__form select,
+.admin-panel__form textarea {
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.admin-panel__checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+.admin-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-panel__ai-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-panel__ai-row input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.admin-panel__list-title {
+  padding: 1rem 1rem 0;
+}
+
+.admin-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-panel__list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-panel__meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0.25rem 0;
+}
+
+.admin-panel__pattern {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--color-accent);
+}
+
+.admin-panel__item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.admin-panel__empty {
+  padding: 1.5rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.orders-panel {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.2fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .orders-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+.orders-panel__order-btn {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.orders-panel__order-btn--active {
+  background: rgb(34 197 94 / 0.08);
+}
+
+.orders-panel__detail {
+  padding: 1.25rem;
+}
+
+.orders-panel__details {
+  margin: 1rem 0;
+  padding-left: 1.25rem;
+}

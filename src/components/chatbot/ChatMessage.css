@@ -1,0 +1,109 @@
+.chat-message {
+  display: flex;
+}
+
+.chat-message--user {
+  justify-content: flex-end;
+}
+
+.chat-message--assistant,
+.chat-message--system {
+  justify-content: flex-start;
+}
+
+.chat-message__bubble {
+  max-width: 85%;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.chat-message--user .chat-message__bubble {
+  background: linear-gradient(135deg, var(--color-primary), #15803d);
+  color: #052e16;
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.chat-message--assistant .chat-message__bubble {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.chat-message--seller .chat-message__bubble {
+  background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+  border: 1px solid rgb(59 130 246 / 0.4);
+  color: #e0f2fe;
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.chat-message__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.15rem;
+  padding-left: 0.15rem;
+}
+
+.chat-message--system .chat-message__bubble {
+  background: var(--color-accent-muted);
+  color: #fdba74;
+  border: 1px solid rgb(249 115 22 / 0.3);
+  font-size: 0.8125rem;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+}
+
+.chat-message--assistant,
+.chat-message--user {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.chat-message--user {
+  align-items: flex-end;
+}
+
+.chat-message__products {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 85%;
+}
+
+.chat-message--user .chat-message__products {
+  align-self: flex-end;
+}
+
+.chat-message__product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+}
+
+.chat-message__product-card strong {
+  color: var(--color-heading);
+  font-size: 0.875rem;
+}
+
+.chat-message__product-link {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.chat-message__product-link:hover {
+  text-decoration: underline;
+}

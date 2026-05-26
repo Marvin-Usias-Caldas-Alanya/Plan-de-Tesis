@@ -1,0 +1,23 @@
+.seller-layout__header {
+  margin-bottom: 1.25rem;
+}
+
+.seller-layout__feedback {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.seller-layout__feedback-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.seller-layout__content {
+  margin-top: 0.5rem;
+}

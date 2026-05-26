@@ -1,0 +1,97 @@
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+
+.ui-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ui-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ui-btn--primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #15803d 100%);
+  color: #052e16;
+  box-shadow: var(--shadow-sm);
+}
+
+.ui-btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #166534 100%);
+  box-shadow: var(--shadow-glow);
+}
+
+.ui-btn--accent {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #c2410c 100%);
+  color: #fff;
+}
+
+.ui-btn--accent:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, #9a3412 100%);
+  box-shadow: 0 0 20px rgb(249 115 22 / 0.35);
+}
+
+.ui-btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.ui-btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.ui-btn--ghost:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: var(--color-primary-muted);
+}
+
+.ui-btn--danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.ui-btn--danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.ui-btn--sm {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8125rem;
+}
+
+.ui-btn--lg {
+  padding: 0.85rem 1.65rem;
+  font-size: 1rem;
+}
+
+.ui-btn--block {
+  width: 100%;
+}

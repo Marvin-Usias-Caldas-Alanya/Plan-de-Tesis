@@ -1,0 +1,9 @@
+.mockups-page__hint {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.mockups-page__hint strong {
+  color: var(--color-heading);
+}

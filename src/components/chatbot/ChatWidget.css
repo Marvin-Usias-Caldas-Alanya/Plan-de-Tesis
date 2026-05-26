@@ -1,0 +1,32 @@
+.chat-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 150;
+}
+
+.chat-widget__toggle {
+  width: 3.75rem;
+  height: 3.75rem;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--color-primary), #15803d);
+  color: #052e16;
+  font-size: 1.35rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+
+.chat-widget__toggle:hover {
+  transform: scale(1.06);
+}
+
+@media (max-width: 480px) {
+  .chat-widget {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}

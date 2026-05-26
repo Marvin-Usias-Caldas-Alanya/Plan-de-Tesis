@@ -1,0 +1,124 @@
+.chatbot-config {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.chatbot-config__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chatbot-config__tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.chatbot-config__tab--active {
+  background: var(--color-primary, #2563eb);
+  color: #fff;
+  border-color: var(--color-primary, #2563eb);
+}
+
+.chatbot-config__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.chatbot-config__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chatbot-config__form input,
+.chatbot-config__form select,
+.chatbot-config__form textarea {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.chatbot-config__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .chatbot-config__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chatbot-config__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.chatbot-config__checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+
+.chatbot-config__table-wrap {
+  overflow-x: auto;
+}
+
+.chatbot-config__badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: #e2e8f0;
+}
+
+.chatbot-config__badge--on {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.chatbot-config__badge--off {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.chatbot-config__preview {
+  border: 1px dashed var(--color-border, #cbd5e1);
+  border-radius: 8px;
+  padding: 1rem;
+  background: #f8fafc;
+  min-height: 4rem;
+  white-space: pre-wrap;
+}
+
+.chatbot-config__preview-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.chatbot-config__product-picks {
+  max-height: 140px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+.chatbot-config__product-picks label {
+  flex-direction: row;
+  font-weight: 400;
+}
