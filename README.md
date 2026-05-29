@@ -185,38 +185,31 @@ src/
 | `/catalogo` | Catálogo                            |
 | `/admin`    | Panel admin: productos, pedidos, redes, chatbot, config |
 | `/vendedor` | Panel vendedor: conversaciones y pedidos (`seller`/`admin`) |
-| `/mockups`  | Galería de mockups (evidencia de diseño, sin auth)          |
 
 ## Verificación antes del despliegue
 
 Ejecuta esta secuencia en la raíz de `suplementos-app` y confirma que todo termina sin errores:
 
-```powershell
-npm.cmd run lint
-npm.cmd run test:coverage
-npm.cmd run build
+```bash
+npm run lint
+npm run test
+npm run test:coverage
+npm run build
 ```
 
-O en un solo comando:
+| Comando         | Qué valida                                   |
+| --------------- | -------------------------------------------- |
+| `npm run lint`  | Calidad y reglas ESLint (React, hooks)       |
+| `npm run test`  | 118 pruebas unitarias y de componentes       |
+| `npm run build` | Compilación de producción en carpeta `dist/` |
 
-```powershell
-npm.cmd run quality
-```
-
-| Comando                  | Qué valida                                      |
-| ------------------------ | ----------------------------------------------- |
-| `npm run lint`           | Calidad y reglas ESLint (React, hooks)          |
-| `npm run test:coverage`  | 196 pruebas + cobertura (> 70% líneas)          |
-| `npm run build`          | Compilación de producción en carpeta `dist/`    |
-| `npm run sonar`          | Análisis estático Sonar (token solo en entorno) |
-
-Documentación completa: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md).
+Opcional: `npm run test:coverage` y `npm run format:check`.
 
 ---
 
 ## Despliegue en Vercel
 
-El proyecto está preparado para publicarse como **SPA** (Single Page Application) con Vite. El archivo `vercel.json` en la raíz configura el build y **rewrites** hacia `index.html` para evitar **error 404** al recargar rutas como `/catalogo`, `/login` o `/admin`.
+El proyecto está preparado para publicarse como **SPA** (Single Page Application) con Vite. El archivo `vercel.json` redirige todas las rutas a `index.html` para evitar **error 404** al recargar páginas como `/catalogo`, `/login` o `/admin`.
 
 ### Requisitos
 
@@ -247,15 +240,12 @@ git push -u origin main
 1. Entra a [vercel.com](https://vercel.com) → **Add New** → **Project**.
 2. Importa el repositorio de GitHub.
 3. Vercel detectará **Vite** automáticamente. Verifica:
+   - **Framework Preset:** Vite
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+   - **Install Command:** `npm install`
 
-| Campo               | Valor              |
-| ------------------- | ------------------ |
-| Framework Preset    | Vite               |
-| **Build Command**   | `npm run build`    |
-| **Output Directory**| `dist`             |
-| Install Command     | `npm install`      |
-
-Estos valores están definidos en `vercel.json` y en `vite.config.js` (`outDir: 'dist'`).
+Estos valores también están definidos en `vercel.json`.
 
 ### Paso 3 — Configurar variables de entorno
 
@@ -311,16 +301,6 @@ Abre `http://localhost:4173` para simular producción en local.
 | Login no funciona en producción | Revisa variables `VITE_*` y URLs en Supabase Auth               |
 | Build falla en Vercel           | Ejecuta `npm run build` localmente y corrige errores            |
 | Pantalla en blanco              | Abre consola del navegador; verifica claves Supabase            |
-
-### Checklist final (tesis)
-
-- [ ] **Lint aprobado** — `npm run lint`
-- [ ] **Test coverage aprobado** — `npm run test:coverage`
-- [ ] **Build aprobado** — `npm run build`
-- [ ] **Sonar aprobado** — `npm run sonar` (token `SONAR_TOKEN` solo local/CI)
-- [ ] **Despliegue aprobado** — URL Vercel operativa, rutas sin 404, login Supabase OK
-
-Detalle académico: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md).
 
 ---
 
