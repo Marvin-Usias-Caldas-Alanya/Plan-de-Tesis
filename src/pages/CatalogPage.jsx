@@ -1,19 +1,24 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ChatWidget from '../components/chatbot/ChatWidget';
 import ProductFilters from '../components/products/ProductFilters';
 import ProductList from '../components/products/ProductList';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
 import { useOrders } from '../hooks/useOrders';
 import {
   buildChatConsultMessage,
   buildPurchaseRequestMessage,
 } from '../utils/productFormatters';
+import { ROUTES } from '../utils/constants';
 import './CatalogPage.css';
 
 export default function CatalogPage() {
-  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [catalogNotice, setCatalogNotice] = useState(null);
@@ -30,6 +35,20 @@ export default function CatalogPage() {
 
   const { products, categories, loading, error, refreshProducts } =
     useProducts(filterParams);
+
+  const { addProduct, submitting: cartSubmitting } = useCart(user?.id);
+
+  useEffect(() => {
+    const hint = location.state?.categoryHint;
+    if (!hint || !categories.length) return;
+
+    const match = categories.find(
+      (cat) =>
+        cat.name.toLowerCase() === String(hint).toLowerCase() ||
+        cat.slug === hint,
+    );
+    if (match) setCategoryId(match.id);
+  }, [location.state, categories]);
 
   const showOrderFeedback = useCallback((type, message) => {
     setCatalogNotice({ type, text: message });
@@ -49,13 +68,37 @@ export default function CatalogPage() {
 
   const handleConsultChat = useCallback(
     (product) => {
+      if (!isAuthenticated) {
+        navigate(ROUTES.LOGIN, { state: { from: location } });
+        return;
+      }
       openChatWithMessage(buildChatConsultMessage(product));
     },
-    [openChatWithMessage],
+    [isAuthenticated, navigate, location, openChatWithMessage],
+  );
+
+  const handleAddToCart = useCallback(
+    async (product) => {
+      if (!isAuthenticated) {
+        navigate(ROUTES.LOGIN, { state: { from: location } });
+        return;
+      }
+      try {
+        await addProduct(product, 1);
+        showOrderFeedback('success', `${product.name} agregado al carrito.`);
+      } catch (err) {
+        showOrderFeedback('error', err.message);
+      }
+    },
+    [isAuthenticated, navigate, location, addProduct, showOrderFeedback],
   );
 
   const handleRequestPurchase = useCallback(
     async (product) => {
+      if (!isAuthenticated) {
+        navigate(ROUTES.LOGIN, { state: { from: location } });
+        return;
+      }
       if (product.stock <= 0) {
         setCatalogNotice({ type: 'error', text: 'Producto agotado.' });
         return;
@@ -75,7 +118,7 @@ export default function CatalogPage() {
         openChatWithMessage(buildPurchaseRequestMessage(product));
       }
     },
-    [createPurchaseOrder, openChatWithMessage],
+    [isAuthenticated, navigate, location, createPurchaseOrder, openChatWithMessage],
   );
 
   const handleChatPromptConsumed = useCallback(() => {
@@ -87,8 +130,8 @@ export default function CatalogPage() {
       <header className="page-header">
         <h1>Catálogo de suplementos</h1>
         <p>
-          Explora proteínas, vitaminas y más. Consulta con el chatbot o solicita tu compra
-          directamente desde cada producto.
+          Explora proteínas, vitaminas y más. Agrega al carrito, consulta con el chatbot o
+          solicita compra asistida por un vendedor.
         </p>
       </header>
 
@@ -112,9 +155,10 @@ export default function CatalogPage() {
 
       <ProductList
         products={products}
-        loading={loading || orderSubmitting}
+        loading={loading || orderSubmitting || cartSubmitting}
         error={error}
         onConsultChat={handleConsultChat}
+        onAddToCart={handleAddToCart}
         onRequestPurchase={handleRequestPurchase}
       />
 

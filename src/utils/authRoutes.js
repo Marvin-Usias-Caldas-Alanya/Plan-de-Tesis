@@ -15,6 +15,8 @@ export function getDefaultRouteForRole(role) {
   }
 }
 
+const CUSTOMER_SHOP_ROUTES = [ROUTES.CART, ROUTES.CHECKOUT, ROUTES.ORDERS];
+
 /**
  * Indica si un rol puede acceder a una ruta protegida por rol.
  */
@@ -26,7 +28,13 @@ export function canAccessRoute(role, pathname) {
     return role === ROLES.SELLER || role === ROLES.ADMIN;
   }
   if (pathname === ROUTES.CATALOG) {
+    return true;
+  }
+  if (CUSTOMER_SHOP_ROUTES.includes(pathname)) {
     return [ROLES.CUSTOMER, ROLES.SELLER, ROLES.ADMIN].includes(role);
+  }
+  if (pathname === ROUTES.PROFILE) {
+    return Boolean(role);
   }
   return true;
 }

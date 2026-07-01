@@ -1,4 +1,4 @@
-import { insertOne, selectMany } from './baseService';
+import { insertOne, selectMany, selectSingle } from './baseService';
 
 export async function getAllPayments() {
   const rows = await selectMany(
@@ -80,4 +80,31 @@ export async function createPromotion(payload) {
 
 export async function createCoupon(payload) {
   return insertOne('coupons', payload, '*', 'crear cupón');
+}
+
+export async function createPayment({
+  orderId,
+  paymentMethodCode,
+  amount,
+  status = 'completed',
+}) {
+  const method = await selectSingle(
+    'payment_methods',
+    'id',
+    { eq: { code: paymentMethodCode } },
+    'método de pago',
+  );
+
+  return insertOne(
+    'payments',
+    {
+      order_id: orderId,
+      payment_method_id: method.id,
+      amount,
+      status,
+      paid_at: status === 'completed' ? new Date().toISOString() : null,
+    },
+    'id, order_id, amount, status, paid_at',
+    'crear pago',
+  );
 }

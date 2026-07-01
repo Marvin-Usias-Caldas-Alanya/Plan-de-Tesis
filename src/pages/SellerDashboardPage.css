@@ -2,6 +2,10 @@
   padding: 1.25rem;
 }
 
+.seller-dashboard__availability {
+  margin-bottom: 1rem;
+}
+
 .seller-dashboard__toolbar {
   display: flex;
   justify-content: space-between;

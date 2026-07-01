@@ -8,6 +8,7 @@ export default function ProductList({
   loading,
   error,
   onConsultChat,
+  onAddToCart,
   onRequestPurchase,
   showActions = true,
 }) {
@@ -39,6 +40,7 @@ export default function ProductList({
           key={product.id}
           product={product}
           onConsultChat={showActions ? onConsultChat : undefined}
+          onAddToCart={showActions ? onAddToCart : undefined}
           onRequestPurchase={showActions ? onRequestPurchase : undefined}
         />
       ))}

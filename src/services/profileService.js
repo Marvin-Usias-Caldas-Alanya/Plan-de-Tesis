@@ -1,6 +1,7 @@
 import {
   insertOne,
   selectMany,
+  selectMaybeSingle,
   selectSingle,
   updateOne,
 } from './baseService';
@@ -63,7 +64,77 @@ export async function updateProfileRole(profileId, roleId) {
     PROFILE_SELECT,
     'actualizar rol de perfil',
   );
+  const profile = mapProfile(row);
+  await ensureRoleEntities(profileId, profile.role_code);
+  return profile;
+}
+
+export async function updateProfile(profileId, { full_name, phone }) {
+  const payload = {};
+  if (full_name !== undefined) payload.full_name = full_name;
+  if (phone !== undefined) payload.phone = phone;
+
+  const row = await updateOne(
+    'profiles',
+    profileId,
+    payload,
+    PROFILE_SELECT,
+    'actualizar perfil',
+  );
   return mapProfile(row);
+}
+
+async function ensureRoleEntities(profileId, roleCode) {
+  if (roleCode === 'seller') {
+    const existing = await selectMaybeSingle(
+      'sellers',
+      'id',
+      { eq: { profile_id: profileId } },
+      'verificar vendedor',
+    );
+    if (!existing) {
+      await insertOne(
+        'sellers',
+        { profile_id: profileId, is_available: true },
+        'id, profile_id',
+        'crear vendedor',
+      );
+    }
+  }
+
+  if (roleCode === 'customer') {
+    const existing = await selectMaybeSingle(
+      'customers',
+      'id',
+      { eq: { profile_id: profileId } },
+      'verificar cliente',
+    );
+    if (!existing) {
+      await createCustomerForProfile(profileId);
+    }
+  }
+}
+
+export async function getSellerAvailability(profileId) {
+  const row = await selectSingle(
+    'sellers',
+    'is_available',
+    { eq: { profile_id: profileId } },
+    'disponibilidad del vendedor',
+  );
+  return row.is_available;
+}
+
+export async function updateSellerAvailability(profileId, isAvailable) {
+  const sellerId = await getSellerIdByProfileId(profileId);
+  await updateOne(
+    'sellers',
+    sellerId,
+    { is_available: isAvailable },
+    'id, is_available',
+    'actualizar disponibilidad',
+  );
+  return isAvailable;
 }
 
 export async function setProfileActive(profileId, isActive) {

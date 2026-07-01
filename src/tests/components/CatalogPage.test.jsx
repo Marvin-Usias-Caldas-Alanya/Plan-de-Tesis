@@ -9,7 +9,7 @@ const mockCreateOrder = vi.fn();
 const mockRefresh = vi.fn();
 
 vi.mock('../../hooks/useAuth.js', () => ({
-  useAuth: () => ({ user: { id: 'u1' } }),
+  useAuth: () => ({ user: { id: 'u1' }, isAuthenticated: true }),
 }));
 
 vi.mock('../../hooks/useProducts.js', () => ({
@@ -19,6 +19,13 @@ vi.mock('../../hooks/useProducts.js', () => ({
 vi.mock('../../hooks/useOrders.js', () => ({
   useOrders: () => ({
     createPurchaseOrder: mockCreateOrder,
+    submitting: false,
+  }),
+}));
+
+vi.mock('../../hooks/useCart.js', () => ({
+  useCart: () => ({
+    addProduct: vi.fn(),
     submitting: false,
   }),
 }));

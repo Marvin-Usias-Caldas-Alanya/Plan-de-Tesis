@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useCart } from '../../hooks/useCart';
 import { APP_NAME, ROUTES, ROLES } from '../../utils/constants';
 import Button from './Button';
 import NotificationsBell from './NotificationsBell';
 import './Navbar.css';
 
 export default function Navbar() {
-  const { isAuthenticated, profile, role, logout, loading } = useAuth();
+  const { isAuthenticated, profile, role, user, logout, loading } = useAuth();
+  const { itemCount } = useCart(isAuthenticated ? user?.id : null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const dashboardRoute =
@@ -27,6 +29,19 @@ export default function Navbar() {
       <NavLink to={ROUTES.CATALOG} className="navbar__link" onClick={closeMenu}>
         Catálogo
       </NavLink>
+      {isAuthenticated && (
+        <>
+          <NavLink to={ROUTES.ORDERS} className="navbar__link" onClick={closeMenu}>
+            Mis pedidos
+          </NavLink>
+          <NavLink to={ROUTES.CART} className="navbar__link" onClick={closeMenu}>
+            Carrito{itemCount > 0 ? ` (${itemCount})` : ''}
+          </NavLink>
+          <NavLink to={ROUTES.PROFILE} className="navbar__link" onClick={closeMenu}>
+            Perfil
+          </NavLink>
+        </>
+      )}
       {dashboardRoute && (
         <NavLink to={dashboardRoute} className="navbar__link" onClick={closeMenu}>
           Panel

@@ -82,7 +82,7 @@ export default function HomePage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatPrompt, setChatPrompt] = useState('');
 
-  const catalogPath = isAuthenticated ? ROUTES.CATALOG : ROUTES.LOGIN;
+  const catalogPath = ROUTES.CATALOG;
 
   const openChat = useCallback(() => {
     if (!isAuthenticated) {
@@ -171,7 +171,7 @@ export default function HomePage() {
             <li key={cat.slug}>
               <Link
                 to={catalogPath}
-                state={isAuthenticated ? { categoryHint: cat.name } : undefined}
+                state={{ categoryHint: cat.slug }}
                 className="home-categories__card"
               >
                 <span className="home-categories__icon" aria-hidden="true">

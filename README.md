@@ -122,7 +122,9 @@ En producción conviene tener siempre `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_
 
 Evidencia de código limpio: [`docs/CODIGO_LIMPIO.md`](docs/CODIGO_LIMPIO.md).  
 Reporte de pruebas (tesis): [`docs/REPORTE_PRUEBAS.md`](docs/REPORTE_PRUEBAS.md).  
-Despliegue en producción: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md).
+Despliegue en producción: [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md).  
+Estado del arte aplicado: [`docs/ESTADO_DEL_ARTE.md`](docs/ESTADO_DEL_ARTE.md).  
+Plan de mantenimiento: [`docs/MANTENIMIENTO.md`](docs/MANTENIMIENTO.md).
 
 ## Cliente Supabase
 

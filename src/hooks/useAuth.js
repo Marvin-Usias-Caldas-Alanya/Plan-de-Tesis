@@ -113,6 +113,12 @@ export function AuthProvider({ children }) {
     setProfile(null);
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    const nextProfile = await getCurrentProfile();
+    setProfile(nextProfile);
+    return nextProfile;
+  }, []);
+
   const role = profile?.role ?? ROLES.CUSTOMER;
 
   const value = useMemo(
@@ -129,9 +135,10 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      refreshProfile,
       clearError: () => setError(null),
     }),
-    [user, profile, role, loading, error, login, register, logout],
+    [user, profile, role, loading, error, login, register, logout, refreshProfile],
   );
 
   return createElement(AuthContext.Provider, { value }, children);

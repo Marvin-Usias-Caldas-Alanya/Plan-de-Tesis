@@ -1,5 +1,22 @@
-import { getSupabaseClient, handleSupabaseError, insertMany, insertOne, selectMany, selectSingle, updateOne } from './baseService';
+import {
+  getSupabaseClient,
+  handleSupabaseError,
+  insertMany,
+  insertOne,
+  selectMany,
+  selectSingle,
+  updateOne,
+} from './baseService';
+import {
+  clearCartItems,
+  getCartItems,
+  getOrCreateActiveCart,
+  markCartConverted,
+} from './cartService';
 import { getCustomerIdByProfileId } from './profileService';
+import { createPayment } from './paymentService';
+import { createSaleFromOrder } from './salesService';
+import { decreaseStock } from './productService';
 
 const ORDER_SELECT = `
   id,
@@ -109,13 +126,13 @@ export async function getOrderDetails(orderId) {
   }));
 }
 
-export async function createOrderFromItems({ profileId, items }) {
+export async function createOrderFromItems({ profileId, items, statusCode = 'pending' }) {
   if (!items?.length) {
     throw new Error('El pedido debe incluir al menos un producto');
   }
 
   const customerId = await getCustomerIdByProfileId(profileId);
-  const pendingStatusId = await getStatusIdByCode('pending');
+  const statusId = await getStatusIdByCode(statusCode);
   const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
@@ -124,7 +141,7 @@ export async function createOrderFromItems({ profileId, items }) {
     {
       order_number: orderNumber,
       customer_id: customerId,
-      status_id: pendingStatusId,
+      status_id: statusId,
       subtotal,
       total_amount: subtotal,
     },
@@ -141,6 +158,64 @@ export async function createOrderFromItems({ profileId, items }) {
 
   await insertMany('order_details', details, 'id', 'crear detalle de pedido');
   return mapOrder(order);
+}
+
+async function fulfillDeliveredOrder(orderId) {
+  const orderRow = await selectSingle(
+    'orders',
+    'id, customer_id, total_amount',
+    { eq: { id: orderId } },
+    'pedido para venta',
+  );
+  const details = await getOrderDetails(orderId);
+
+  await createSaleFromOrder({
+    orderId,
+    customerId: orderRow.customer_id,
+    totalAmount: Number(orderRow.total_amount),
+    items: details,
+  });
+
+  for (const line of details) {
+    await decreaseStock(line.product_id, line.quantity);
+  }
+}
+
+export async function completeCheckout({ profileId, paymentMethodCode = 'card' }) {
+  const cart = await getOrCreateActiveCart(profileId);
+  const items = await getCartItems(cart.id);
+
+  if (!items.length) {
+    throw new Error('Tu carrito está vacío');
+  }
+
+  for (const item of items) {
+    if (item.quantity > item.stock) {
+      throw new Error(`Stock insuficiente para ${item.product_name ?? 'un producto'}`);
+    }
+  }
+
+  const orderItems = items.map((item) => ({
+    productId: item.product_id,
+    quantity: item.quantity,
+    unitPrice: item.unit_price,
+  }));
+
+  const order = await createOrderFromItems({ profileId, items: orderItems, statusCode: 'pending' });
+
+  await createPayment({
+    orderId: order.id,
+    paymentMethodCode,
+    amount: order.total_amount,
+    status: 'completed',
+  });
+
+  const confirmed = await updateOrderStatus(order.id, 'confirmed');
+
+  await clearCartItems(cart.id);
+  await markCartConverted(cart.id);
+
+  return confirmed;
 }
 
 export async function assignOrderToSeller(orderId, sellerId) {
@@ -163,5 +238,11 @@ export async function updateOrderStatus(orderId, statusCode) {
     ORDER_SELECT,
     'actualizar estado de pedido',
   );
-  return mapOrder(row);
+  const order = mapOrder(row);
+
+  if (statusCode === 'delivered') {
+    await fulfillDeliveredOrder(orderId);
+  }
+
+  return order;
 }

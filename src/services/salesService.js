@@ -1,4 +1,4 @@
-import { selectMany } from './baseService';
+import { insertMany, insertOne, selectMany, selectMaybeSingle } from './baseService';
 
 const SALE_SELECT = `
   id,
@@ -55,4 +55,42 @@ export async function getSaleDetails(saleId) {
     quantity: row.quantity,
     unit_price: Number(row.unit_price),
   }));
+}
+
+export async function getSaleByOrderId(orderId) {
+  const row = await selectMaybeSingle(
+    'sales',
+    SALE_SELECT,
+    { eq: { order_id: orderId } },
+    'venta por pedido',
+  );
+  return mapSale(row);
+}
+
+export async function createSaleFromOrder({ orderId, customerId, totalAmount, items }) {
+  const existing = await getSaleByOrderId(orderId);
+  if (existing) return existing;
+
+  const saleNumber = `V-${Date.now().toString(36).toUpperCase()}`;
+  const sale = await insertOne(
+    'sales',
+    {
+      order_id: orderId,
+      customer_id: customerId,
+      total_amount: totalAmount,
+      sale_number: saleNumber,
+    },
+    SALE_SELECT,
+    'crear venta',
+  );
+
+  const detailRows = items.map((item) => ({
+    sale_id: sale.id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    unit_price: item.unit_price,
+  }));
+
+  await insertMany('sale_details', detailRows, 'id', 'crear detalle de venta');
+  return mapSale(sale);
 }

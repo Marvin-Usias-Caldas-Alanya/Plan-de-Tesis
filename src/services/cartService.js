@@ -1,9 +1,12 @@
 import {
+  deleteOne,
   getSupabaseClient,
   handleSupabaseError,
   insertOne,
   selectMany,
   selectMaybeSingle,
+  updateOne,
+  updateWhere,
 } from './baseService';
 import { getCustomerIdByProfileId } from './profileService';
 
@@ -17,6 +20,12 @@ export async function getActiveCartByProfileId(profileId) {
   );
 }
 
+export async function getOrCreateActiveCart(profileId) {
+  const existing = await getActiveCartByProfileId(profileId);
+  if (existing) return existing;
+  return createCartForProfile(profileId);
+}
+
 export async function getCartItems(cartId) {
   const rows = await selectMany(
     'cart_items',
@@ -25,7 +34,6 @@ export async function getCartItems(cartId) {
       cart_id,
       product_id,
       quantity,
-      unit_price,
       products ( name, sku, price, stock )
     `,
     { eq: { cart_id: cartId } },
@@ -38,7 +46,7 @@ export async function getCartItems(cartId) {
     product_name: row.products?.name ?? null,
     sku: row.products?.sku ?? null,
     quantity: row.quantity,
-    unit_price: Number(row.unit_price ?? row.products?.price ?? 0),
+    unit_price: Number(row.products?.price ?? 0),
     stock: row.products?.stock ?? 0,
   }));
 }
@@ -53,21 +61,55 @@ export async function createCartForProfile(profileId) {
   );
 }
 
-export async function addItemToCart(cartId, { productId, quantity, unitPrice }) {
+export async function upsertCartItem(cartId, { productId, quantity }) {
+  const existing = await selectMaybeSingle(
+    'cart_items',
+    'id, quantity',
+    { eq: { cart_id: cartId, product_id: productId } },
+    'buscar ítem en carrito',
+  );
+
+  if (existing) {
+    return updateOne(
+      'cart_items',
+      existing.id,
+      { quantity: existing.quantity + quantity },
+      'id, cart_id, product_id, quantity',
+      'actualizar ítem del carrito',
+    );
+  }
+
   return insertOne(
     'cart_items',
-    {
-      cart_id: cartId,
-      product_id: productId,
-      quantity,
-      unit_price: unitPrice,
-    },
-    'id, cart_id, product_id, quantity, unit_price',
+    { cart_id: cartId, product_id: productId, quantity },
+    'id, cart_id, product_id, quantity',
     'agregar ítem al carrito',
   );
+}
+
+export async function updateCartItemQuantity(cartItemId, quantity) {
+  if (quantity <= 0) {
+    await removeCartItem(cartItemId);
+    return null;
+  }
+  return updateOne(
+    'cart_items',
+    cartItemId,
+    { quantity },
+    'id, quantity',
+    'actualizar cantidad del carrito',
+  );
+}
+
+export async function removeCartItem(cartItemId) {
+  await deleteOne('cart_items', cartItemId, 'eliminar ítem del carrito');
 }
 
 export async function clearCartItems(cartId) {
   const { error } = await getSupabaseClient().from('cart_items').delete().eq('cart_id', cartId);
   if (error) handleSupabaseError(error, 'vaciar carrito');
+}
+
+export async function markCartConverted(cartId) {
+  await updateWhere('carts', { id: cartId }, { status: 'converted' }, 'convertir carrito');
 }

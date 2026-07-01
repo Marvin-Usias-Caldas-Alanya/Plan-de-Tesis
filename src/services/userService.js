@@ -7,8 +7,11 @@ export {
   getAllSellers,
   setProfileActive,
   updateProfileRole as updateUserRole,
+  updateProfile,
   getCustomerIdByProfileId,
   getSellerIdByProfileId,
+  getSellerAvailability,
+  updateSellerAvailability,
 } from './profileService';
 
 export { getRoles } from './roleService';

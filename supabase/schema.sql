@@ -1081,6 +1081,75 @@ CREATE POLICY "non_mvp_carts" ON public.carts FOR ALL TO authenticated
   USING (EXISTS (SELECT 1 FROM public.customers c WHERE c.id = customer_id AND c.profile_id = auth.uid()))
   WITH CHECK (EXISTS (SELECT 1 FROM public.customers c WHERE c.id = customer_id AND c.profile_id = auth.uid()));
 
+DROP POLICY IF EXISTS "cart_items_own" ON public.cart_items;
+DROP POLICY IF EXISTS "order_details_insert" ON public.order_details;
+DROP POLICY IF EXISTS "orders_staff_update" ON public.orders;
+DROP POLICY IF EXISTS "sales_staff" ON public.sales;
+DROP POLICY IF EXISTS "sale_details_staff" ON public.sale_details;
+DROP POLICY IF EXISTS "payments_customer_read" ON public.payments;
+DROP POLICY IF EXISTS "payments_customer_insert" ON public.payments;
+DROP POLICY IF EXISTS "products_stock_staff" ON public.products;
+DROP POLICY IF EXISTS "sellers_update_own" ON public.sellers;
+
+CREATE POLICY "cart_items_own" ON public.cart_items FOR ALL TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.carts ct
+      JOIN public.customers c ON c.id = ct.customer_id
+      WHERE ct.id = cart_id AND c.profile_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.carts ct
+      JOIN public.customers c ON c.id = ct.customer_id
+      WHERE ct.id = cart_id AND c.profile_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "order_details_insert" ON public.order_details FOR INSERT TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.orders o
+      JOIN public.customers c ON c.id = o.customer_id
+      WHERE o.id = order_id AND c.profile_id = auth.uid()
+    )
+    OR public.is_staff()
+  );
+
+CREATE POLICY "orders_staff_update" ON public.orders FOR UPDATE TO authenticated
+  USING (public.is_staff()) WITH CHECK (public.is_staff());
+
+CREATE POLICY "sales_staff" ON public.sales FOR ALL TO authenticated
+  USING (public.is_staff()) WITH CHECK (public.is_staff());
+
+CREATE POLICY "sale_details_staff" ON public.sale_details FOR ALL TO authenticated
+  USING (public.is_staff()) WITH CHECK (public.is_staff());
+
+CREATE POLICY "payments_customer_read" ON public.payments FOR SELECT TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.orders o
+      JOIN public.customers c ON c.id = o.customer_id
+      WHERE o.id = order_id AND c.profile_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "payments_customer_insert" ON public.payments FOR INSERT TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.orders o
+      JOIN public.customers c ON c.id = o.customer_id
+      WHERE o.id = order_id AND c.profile_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "products_stock_staff" ON public.products FOR UPDATE TO authenticated
+  USING (public.is_staff()) WITH CHECK (public.is_staff());
+
+CREATE POLICY "sellers_update_own" ON public.sellers FOR UPDATE TO authenticated
+  USING (profile_id = auth.uid()) WITH CHECK (profile_id = auth.uid());
+
 -- =============================================================================
 -- 10. DATOS DE PRUEBA (al final)
 -- =============================================================================

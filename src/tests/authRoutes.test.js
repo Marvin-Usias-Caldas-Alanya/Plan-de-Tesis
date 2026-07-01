@@ -19,5 +19,7 @@ describe('authRoutes', () => {
     expect(canAccessRoute(ROLES.ADMIN, ROUTES.ADMIN_DASHBOARD)).toBe(true);
     expect(canAccessRoute(ROLES.CUSTOMER, ROUTES.ADMIN_DASHBOARD)).toBe(false);
     expect(canAccessRoute(ROLES.CUSTOMER, ROUTES.CATALOG)).toBe(true);
+    expect(canAccessRoute(null, ROUTES.CATALOG)).toBe(true);
+    expect(canAccessRoute(ROLES.CUSTOMER, ROUTES.CART)).toBe(true);
   });
 });

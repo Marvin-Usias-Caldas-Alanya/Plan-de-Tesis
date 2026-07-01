@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 import SellerLayout from '../components/dashboard/SellerLayout';
 import SellerTabs from '../components/dashboard/SellerTabs';
 import OrdersPanel from '../components/dashboard/OrdersPanel';
@@ -7,6 +8,7 @@ import ConversationList from '../components/chatbot/ConversationList';
 import ConversationDetail from '../components/chatbot/ConversationDetail';
 import { useAuth } from '../hooks/useAuth';
 import { useSellerConversations } from '../hooks/useSellerConversations';
+import { getSellerAvailability, updateSellerAvailability } from '../services/profileService';
 import { CHAT_STATUS } from '../utils/constants';
 import './SellerDashboardPage.css';
 
@@ -16,10 +18,19 @@ export default function SellerDashboardPage() {
   const [feedback, setFeedback] = useState(null);
   const [attending, setAttending] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [isAvailable, setIsAvailable] = useState(true);
+  const [togglingAvailability, setTogglingAvailability] = useState(false);
 
   const showFeedback = useCallback((type, message) => {
     setFeedback({ type, message });
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getSellerAvailability(user.id)
+      .then(setIsAvailable)
+      .catch(() => setIsAvailable(true));
+  }, [user?.id]);
 
   const {
     conversations,
@@ -47,12 +58,27 @@ export default function SellerDashboardPage() {
       },
       {
         label: 'Estado',
-        value: 'En línea',
-        hint: 'Disponible para atención',
+        value: isAvailable ? 'En línea' : 'No disponible',
+        hint: 'Visible para asignación de pedidos',
       },
     ],
-    [conversations.length],
+    [conversations.length, isAvailable],
   );
+
+  const handleToggleAvailability = async () => {
+    if (!user?.id) return;
+    setTogglingAvailability(true);
+    try {
+      const next = !isAvailable;
+      await updateSellerAvailability(user.id, next);
+      setIsAvailable(next);
+      showFeedback('success', next ? 'Estás en línea' : 'Marcado como no disponible');
+    } catch (err) {
+      showFeedback('error', err.message);
+    } finally {
+      setTogglingAvailability(false);
+    }
+  };
 
   const handleAttend = async () => {
     setAttending(true);
@@ -100,6 +126,17 @@ export default function SellerDashboardPage() {
         setError(null);
       }}
     >
+      <div className="seller-dashboard__availability">
+        <Button
+          size="sm"
+          variant={isAvailable ? 'accent' : 'secondary'}
+          disabled={togglingAvailability}
+          onClick={handleToggleAvailability}
+        >
+          {isAvailable ? 'Marcar no disponible' : 'Marcar en línea'}
+        </Button>
+      </div>
+
       <SellerTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {activeTab === 'orders' && (

@@ -9,7 +9,12 @@ import {
 import { formatProductPrice } from '../../utils/productFormatters';
 import './ProductCard.css';
 
-export default function ProductCard({ product, onConsultChat, onRequestPurchase }) {
+export default function ProductCard({
+  product,
+  onConsultChat,
+  onAddToCart,
+  onRequestPurchase,
+}) {
   const { name, description, price, stock, category, image_url } = product;
   const stockStatus = getStockStatus(product);
   const purchasable = canPurchase(product);
@@ -47,6 +52,16 @@ export default function ProductCard({ product, onConsultChat, onRequestPurchase 
         </div>
 
         <div className="product-card__actions">
+          {onAddToCart && (
+            <Button
+              size="sm"
+              block
+              disabled={!purchasable}
+              onClick={() => onAddToCart?.(product)}
+            >
+              Agregar al carrito
+            </Button>
+          )}
           <Button
             variant="secondary"
             size="sm"
