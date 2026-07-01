@@ -4,6 +4,7 @@ import {
   selectSingle,
   updateOne,
 } from './baseService';
+import { listProfilesLinked } from './listQueryService';
 import { normalizeProfileRow, resolveProfileName } from '../utils/profileFields';
 
 const PROFILE_SELECT = `
@@ -228,56 +229,32 @@ export async function getSellerIdByProfileId(profileId) {
 }
 
 export async function getAllCustomers() {
-  const rows = await selectMany(
+  return listProfilesLinked(
     'customers',
-    `
-      id,
-      document_id,
-      loyalty_points,
-      created_at,
-      profiles ( id, email, role )
-    `,
-    { order: 'created_at', ascending: false },
+    'id, document_id, loyalty_points, created_at',
+    (row) => ({
+      id: row.id,
+      document_id: row.document_id,
+      loyalty_points: row.loyalty_points,
+      role_code: row.profiles?.role ?? null,
+      created_at: row.created_at,
+    }),
     'listar clientes',
   );
-
-  return rows.map((row) => ({
-    id: row.id,
-    document_id: row.document_id,
-    loyalty_points: row.loyalty_points,
-    profile_id: row.profiles?.id,
-    email: row.profiles?.email,
-    full_name: resolveProfileName(row.profiles),
-    is_active: row.profiles?.is_active ?? true,
-    role_code: row.profiles?.role ?? null,
-    created_at: row.created_at,
-  }));
 }
 
 export async function getAllSellers() {
-  const rows = await selectMany(
+  return listProfilesLinked(
     'sellers',
-    `
-      id,
-      employee_code,
-      is_available,
-      created_at,
-      profiles ( id, email, role )
-    `,
-    { order: 'created_at', ascending: false },
+    'id, employee_code, is_available, created_at',
+    (row) => ({
+      id: row.id,
+      employee_code: row.employee_code,
+      is_available: row.is_available,
+      created_at: row.created_at,
+    }),
     'listar vendedores',
   );
-
-  return rows.map((row) => ({
-    id: row.id,
-    employee_code: row.employee_code,
-    is_available: row.is_available,
-    profile_id: row.profiles?.id,
-    email: row.profiles?.email,
-    full_name: resolveProfileName(row.profiles),
-    is_active: row.profiles?.is_active ?? true,
-    created_at: row.created_at,
-  }));
 }
 
 export async function createCustomerForProfile(profileId, documentId = null) {

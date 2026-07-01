@@ -17,6 +17,7 @@ import { getCustomerIdByProfileId } from './profileService';
 import { createPayment } from './paymentService';
 import { createSaleFromOrder } from './salesService';
 import { decreaseStock } from './productService';
+import { fetchProductLines } from '../utils/lineItemMappers';
 import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 const ORDER_SELECT = `
@@ -115,27 +116,7 @@ export async function getOrdersForSeller(profileId) {
 }
 
 export async function getOrderDetails(orderId) {
-  const rows = await selectMany(
-    'order_details',
-    `
-      id,
-      product_id,
-      quantity,
-      unit_price,
-      products ( name, sku )
-    `,
-    { eq: { order_id: orderId } },
-    'detalle de pedido',
-  );
-
-  return rows.map((row) => ({
-    id: row.id,
-    product_id: row.product_id,
-    product_name: row.products?.name ?? null,
-    sku: row.products?.sku ?? null,
-    quantity: row.quantity,
-    unit_price: Number(row.unit_price),
-  }));
+  return fetchProductLines(selectMany, 'order_details', 'order_id', orderId, 'detalle de pedido');
 }
 
 export async function createOrderFromItems({ profileId, items, statusCode = 'pending' }) {

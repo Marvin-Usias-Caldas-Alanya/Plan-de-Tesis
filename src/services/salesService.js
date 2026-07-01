@@ -1,4 +1,5 @@
 import { insertMany, insertOne, selectMany, selectMaybeSingle } from './baseService';
+import { fetchProductLines } from '../utils/lineItemMappers';
 import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 const SALE_SELECT = `
@@ -37,25 +38,7 @@ export async function getAllSales() {
 }
 
 export async function getSaleDetails(saleId) {
-  const rows = await selectMany(
-    'sale_details',
-    `
-      id,
-      quantity,
-      unit_price,
-      products ( name, sku )
-    `,
-    { eq: { sale_id: saleId } },
-    'detalle de venta',
-  );
-
-  return rows.map((row) => ({
-    id: row.id,
-    product_name: row.products?.name,
-    sku: row.products?.sku,
-    quantity: row.quantity,
-    unit_price: Number(row.unit_price),
-  }));
+  return fetchProductLines(selectMany, 'sale_details', 'sale_id', saleId, 'detalle de venta');
 }
 
 export async function getSaleByOrderId(orderId) {

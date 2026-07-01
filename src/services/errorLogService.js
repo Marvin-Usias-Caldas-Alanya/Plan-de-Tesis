@@ -1,18 +1,9 @@
-import { selectMany } from './baseService';
-import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
+import { listWithDirectProfile, resolveProfileName } from './listQueryService';
 
 export async function getErrorLogs(limit = 100) {
-  const rows = await selectMany(
+  const rows = await listWithDirectProfile(
     'error_logs',
-    `
-      id,
-      error_code,
-      message,
-      severity,
-      context,
-      created_at,
-      profiles ( ${PROFILE_NESTED_SELECT} )
-    `,
+    'id, error_code, message, severity, context, created_at',
     { order: 'created_at', ascending: false, limit },
     'listar logs de error',
   );

@@ -1,5 +1,5 @@
 import { getSupabaseClient, handleSupabaseError, insertOne, selectMany, updateOne, updateWhere } from './baseService';
-import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
+import { listWithDirectProfile, resolveProfileName } from './listQueryService';
 
 export function mapNotification(row) {
   if (!row) return null;
@@ -31,17 +31,9 @@ export async function getNotificationsForProfile(profileId, { unreadOnly = false
 }
 
 export async function getAllNotifications(limit = 100) {
-  const rows = await selectMany(
+  const rows = await listWithDirectProfile(
     'notifications',
-    `
-      id,
-      title,
-      body,
-      type,
-      is_read,
-      created_at,
-      profiles ( ${PROFILE_NESTED_SELECT} )
-    `,
+    'id, title, body, type, is_read, created_at',
     { order: 'created_at', ascending: false, limit },
     'notificaciones admin',
   );

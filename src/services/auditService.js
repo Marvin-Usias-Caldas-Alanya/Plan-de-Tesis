@@ -1,18 +1,9 @@
-import { selectMany } from './baseService';
-import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
+import { listWithDirectProfile, resolveProfileName } from './listQueryService';
 
 export async function getAuditLogs(limit = 100) {
-  const rows = await selectMany(
+  const rows = await listWithDirectProfile(
     'audit_logs',
-    `
-      id,
-      action,
-      table_name,
-      record_id,
-      payload,
-      created_at,
-      profiles ( ${PROFILE_NESTED_SELECT} )
-    `,
+    'id, action, table_name, record_id, payload, created_at',
     { order: 'created_at', ascending: false, limit },
     'logs de auditoría',
   );
