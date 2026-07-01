@@ -3,7 +3,6 @@ import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import ErrorMessage from '../components/common/ErrorMessage';
 import Loading from '../components/common/Loading';
-import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { formatProductPrice } from '../utils/productFormatters';
 import { ROUTES } from '../utils/constants';
@@ -11,10 +10,7 @@ import './CustomerPages.css';
 
 export default function CartPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { items, subtotal, loading, submitting, error, setQuantity, removeItem } = useCart(
-    user?.id,
-  );
+  const { items, subtotal, loading, submitting, error, setQuantity, removeItem } = useCart();
 
   if (loading) {
     return (

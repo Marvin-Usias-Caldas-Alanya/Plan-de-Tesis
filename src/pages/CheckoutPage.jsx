@@ -16,7 +16,7 @@ import './CustomerPages.css';
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { items, subtotal, loading, submitting, error } = useCart(user?.id);
+  const { items, subtotal, loading, submitting, error } = useCart();
   const [methods, setMethods] = useState([]);
   const [selectedMethod, setSelectedMethod] = useState('card');
   const [checkoutError, setCheckoutError] = useState(null);

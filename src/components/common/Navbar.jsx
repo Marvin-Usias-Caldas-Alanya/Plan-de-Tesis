@@ -9,7 +9,7 @@ import './Navbar.css';
 
 export default function Navbar() {
   const { isAuthenticated, profile, role, user, logout, loading } = useAuth();
-  const { itemCount } = useCart(isAuthenticated ? user?.id : null);
+  const { itemCount } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const dashboardRoute =
@@ -34,8 +34,13 @@ export default function Navbar() {
           <NavLink to={ROUTES.ORDERS} className="navbar__link" onClick={closeMenu}>
             Mis pedidos
           </NavLink>
-          <NavLink to={ROUTES.CART} className="navbar__link" onClick={closeMenu}>
-            Carrito{itemCount > 0 ? ` (${itemCount})` : ''}
+          <NavLink to={ROUTES.CART} className="navbar__link navbar__link--cart" onClick={closeMenu}>
+            Carrito
+            {itemCount > 0 && (
+              <span className="navbar__cart-badge" aria-label={`${itemCount} productos`}>
+                {itemCount}
+              </span>
+            )}
           </NavLink>
           <NavLink to={ROUTES.PROFILE} className="navbar__link" onClick={closeMenu}>
             Perfil

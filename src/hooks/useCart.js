@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  createElement,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   getCartItems,
   getOrCreateActiveCart,
@@ -6,8 +14,14 @@ import {
   updateCartItemQuantity,
   upsertCartItem,
 } from '../services/cartService';
+import { useAuth } from './useAuth';
 
-export function useCart(profileId) {
+const CartContext = createContext(null);
+
+export function CartProvider({ children }) {
+  const { user } = useAuth();
+  const profileId = user?.id ?? null;
+
   const [cartId, setCartId] = useState(null);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -115,17 +129,42 @@ export function useCart(profileId) {
     [items],
   );
 
-  return {
-    cartId,
-    items,
-    itemCount,
-    subtotal,
-    loading,
-    submitting,
-    error,
-    refresh,
-    addProduct,
-    setQuantity,
-    removeItem,
-  };
+  const value = useMemo(
+    () => ({
+      cartId,
+      items,
+      itemCount,
+      subtotal,
+      loading,
+      submitting,
+      error,
+      refresh,
+      addProduct,
+      setQuantity,
+      removeItem,
+    }),
+    [
+      cartId,
+      items,
+      itemCount,
+      subtotal,
+      loading,
+      submitting,
+      error,
+      refresh,
+      addProduct,
+      setQuantity,
+      removeItem,
+    ],
+  );
+
+  return createElement(CartContext.Provider, { value }, children);
+}
+
+export function useCart() {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart debe usarse dentro de CartProvider');
+  }
+  return context;
 }

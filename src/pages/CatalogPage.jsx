@@ -36,7 +36,7 @@ export default function CatalogPage() {
   const { products, categories, loading, error, refreshProducts } =
     useProducts(filterParams);
 
-  const { addProduct, submitting: cartSubmitting } = useCart(user?.id);
+  const { addProduct, submitting: cartSubmitting } = useCart();
 
   useEffect(() => {
     const hint = location.state?.categoryHint;
