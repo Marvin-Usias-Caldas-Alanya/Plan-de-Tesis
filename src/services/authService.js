@@ -9,7 +9,7 @@ function normalizeProfile(row) {
   if (!row) return null;
   return {
     ...row,
-    role: row.role_code ?? ROLES.CUSTOMER,
+    role: row.role_code ?? row.role ?? ROLES.CUSTOMER,
     roles: undefined,
   };
 }

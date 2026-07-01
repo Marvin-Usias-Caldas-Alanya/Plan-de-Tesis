@@ -19,6 +19,18 @@ const PROFILE_SELECT = `
   roles ( id, code, name )
 `;
 
+const PROFILE_LEGACY_SELECT = `
+  id,
+  email,
+  full_name,
+  phone,
+  avatar_url,
+  is_active,
+  role,
+  created_at,
+  updated_at
+`;
+
 export function mapProfile(row) {
   if (!row) return null;
   return {
@@ -28,9 +40,9 @@ export function mapProfile(row) {
     phone: row.phone,
     avatar_url: row.avatar_url,
     is_active: row.is_active,
-    role_id: row.role_id,
-    role_code: row.roles?.code ?? null,
-    role_name: row.roles?.name ?? null,
+    role_id: row.role_id ?? null,
+    role_code: row.roles?.code ?? row.role ?? null,
+    role_name: row.roles?.name ?? row.role ?? null,
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -47,13 +59,23 @@ export async function getAllProfiles() {
 }
 
 export async function getProfileById(profileId) {
-  const row = await selectSingle(
-    'profiles',
-    PROFILE_SELECT,
-    { eq: { id: profileId } },
-    'obtener perfil',
-  );
-  return mapProfile(row);
+  try {
+    const row = await selectSingle(
+      'profiles',
+      PROFILE_SELECT,
+      { eq: { id: profileId } },
+      'obtener perfil',
+    );
+    return mapProfile(row);
+  } catch {
+    const row = await selectSingle(
+      'profiles',
+      PROFILE_LEGACY_SELECT,
+      { eq: { id: profileId } },
+      'obtener perfil legacy',
+    );
+    return mapProfile(row);
+  }
 }
 
 export async function updateProfileRole(profileId, roleId) {
@@ -149,13 +171,16 @@ export async function setProfileActive(profileId, isActive) {
 }
 
 export async function getCustomerIdByProfileId(profileId) {
-  const row = await selectSingle(
+  const row = await selectMaybeSingle(
     'customers',
     'id',
     { eq: { profile_id: profileId } },
     'obtener cliente por perfil',
   );
-  return row.id;
+  if (row?.id) return row.id;
+
+  const created = await createCustomerForProfile(profileId);
+  return created.id;
 }
 
 export async function getSellerIdByProfileId(profileId) {

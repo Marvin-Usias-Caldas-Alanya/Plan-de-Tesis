@@ -10,14 +10,41 @@ import {
 } from './baseService';
 import { getCustomerIdByProfileId } from './profileService';
 
+const CART_SELECT = 'id, customer_id, status, created_at, updated_at';
+
+async function abandonExtraActiveCarts(customerId, keepCartId) {
+  const supabase = getSupabaseClient();
+  const { error } = await supabase
+    .from('carts')
+    .update({ status: 'abandoned' })
+    .eq('customer_id', customerId)
+    .eq('status', 'active')
+    .neq('id', keepCartId);
+
+  if (error) handleSupabaseError(error, 'consolidar carritos activos');
+}
+
 export async function getActiveCartByProfileId(profileId) {
   const customerId = await getCustomerIdByProfileId(profileId);
-  return selectMaybeSingle(
+  const rows = await selectMany(
     'carts',
-    'id, customer_id, status, created_at, updated_at',
-    { eq: { customer_id: customerId, status: 'active' } },
+    CART_SELECT,
+    {
+      eq: { customer_id: customerId, status: 'active' },
+      order: 'created_at',
+      ascending: false,
+    },
     'obtener carrito activo',
   );
+
+  if (!rows.length) return null;
+
+  const [latest, ...duplicates] = rows;
+  if (duplicates.length) {
+    await abandonExtraActiveCarts(customerId, latest.id);
+  }
+
+  return latest;
 }
 
 export async function getOrCreateActiveCart(profileId) {
