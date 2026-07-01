@@ -10,7 +10,7 @@
   height: 3.75rem;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, var(--color-primary), #15803d);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: #052e16;
   font-size: 1.35rem;
   cursor: pointer;

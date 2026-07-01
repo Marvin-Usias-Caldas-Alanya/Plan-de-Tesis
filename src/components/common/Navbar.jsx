@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useCart } from '../../hooks/useCart';
-import { APP_NAME, ROUTES, ROLES } from '../../utils/constants';
+import { APP_NAME, APP_TAGLINE, ROUTES, ROLES } from '../../utils/constants';
 import Button from './Button';
 import NotificationsBell from './NotificationsBell';
 import './Navbar.css';
@@ -54,17 +54,14 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar__inner">
         <Link to={ROUTES.HOME} className="navbar__brand" onClick={closeMenu}>
-          <span className="navbar__logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-              <path
-                d="M12 2L4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="rgb(34 197 94 / 0.2)"
-              />
-            </svg>
-          </span>
-          <span className="navbar__title">{APP_NAME}</span>
+          <img
+            src="/nutriland-logo.svg"
+            alt={APP_NAME}
+            className="navbar__logo"
+            width="180"
+            height="40"
+          />
+          <span className="navbar__title">{APP_TAGLINE}</span>
         </Link>
 
         <button

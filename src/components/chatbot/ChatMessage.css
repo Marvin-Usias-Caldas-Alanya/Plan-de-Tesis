@@ -20,8 +20,8 @@
 }
 
 .chat-message--user .chat-message__bubble {
-  background: linear-gradient(135deg, var(--color-primary), #15803d);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-on-primary);
   border-bottom-right-radius: var(--radius-sm);
 }
 

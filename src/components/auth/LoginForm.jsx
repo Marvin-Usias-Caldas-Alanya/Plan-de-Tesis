@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Card from '../common/Card';
 import { useAuth } from '../../hooks/useAuth';
-import { ROUTES } from '../../utils/constants';
+import { APP_NAME, ROUTES } from '../../utils/constants';
 import { getDefaultRouteForRole } from '../../utils/authRoutes';
 import { validateLoginForm } from '../../utils/validators';
 import Button from '../common/Button';
@@ -46,7 +46,7 @@ export default function LoginForm() {
     <Card elevated className="auth-page__card">
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         <h2>Iniciar sesión</h2>
-        <p className="auth-form__subtitle">Accede a tu cuenta de NutriStore</p>
+        <p className="auth-form__subtitle">Accede a tu cuenta de {APP_NAME}</p>
 
         <AuthAlert type="error" message={authError} />
 

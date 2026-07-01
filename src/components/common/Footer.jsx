@@ -1,4 +1,4 @@
-import { APP_NAME } from '../../utils/constants';
+import { APP_NAME, APP_TAGLINE } from '../../utils/constants';
 import './Footer.css';
 
 export default function Footer() {
@@ -10,6 +10,7 @@ export default function Footer() {
         <p className="footer__brand">
           © {year} {APP_NAME}
         </p>
+        <p className="footer__tagline">{APP_TAGLINE}</p>
         <p className="footer__academic">
           Sistema desarrollado como parte de un proyecto de tesis de Ingeniería de
           Sistemas e Informática.

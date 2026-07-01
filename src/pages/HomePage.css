@@ -8,8 +8,8 @@
   padding: clamp(3rem, 8vw, 5.5rem) 1.25rem clamp(3.5rem, 10vw, 6rem);
   margin: -1.5rem -1.25rem 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgb(34 197 94 / 0.18), transparent),
-    radial-gradient(ellipse 50% 40% at 100% 50%, rgb(249 115 22 / 0.08), transparent),
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgb(245 197 24 / 0.16), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 50%, rgb(230 57 70 / 0.08), transparent),
     var(--color-bg);
   border-bottom: 1px solid var(--color-border);
 }
@@ -27,7 +27,7 @@
   height: 320px;
   top: 10%;
   left: -8%;
-  background: rgb(34 197 94 / 0.25);
+  background: rgb(245 197 24 / 0.22);
 }
 
 .home-hero__glow--right {
@@ -55,7 +55,7 @@
   letter-spacing: 0.02em;
   color: var(--color-primary);
   background: var(--color-primary-muted);
-  border: 1px solid rgb(34 197 94 / 0.35);
+  border: 1px solid rgb(245 197 24 / 0.35);
   border-radius: var(--radius-full);
 }
 
@@ -68,7 +68,7 @@
   background: linear-gradient(
     135deg,
     #fff 0%,
-    #a7f3d0 40%,
+    #fde68a 40%,
     var(--color-primary) 70%,
     var(--color-accent) 100%
   );
@@ -178,7 +178,7 @@
 
 .home-benefits__card:hover {
   transform: translateY(-4px);
-  border-color: rgb(34 197 94 / 0.4);
+  border-color: rgb(245 197 24 / 0.4);
   box-shadow: var(--shadow-md), var(--shadow-glow);
 }
 
@@ -318,7 +318,7 @@
 }
 
 .home-hybrid__step--accent {
-  border-color: rgb(249 115 22 / 0.35);
+  border-color: rgb(230 57 70 / 0.35);
 }
 
 .home-hybrid__step--info {

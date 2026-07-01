@@ -26,7 +26,8 @@ export const CHAT_STATUS = {
   CLOSED: 'closed',
 };
 
-export const APP_NAME = 'NutriStore';
+export const APP_NAME = 'Nutriland Sport';
+export const APP_TAGLINE = 'Impulsando tu mejor versión';
 
 /** Mensaje fijo al cliente cuando se activa handoff humano */
 export const HANDOFF_CLIENT_MESSAGE =

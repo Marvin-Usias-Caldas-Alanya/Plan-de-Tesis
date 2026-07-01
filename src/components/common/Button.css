@@ -32,13 +32,13 @@
 }
 
 .ui-btn--primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, #15803d 100%);
-  color: #052e16;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  color: var(--color-on-primary);
   box-shadow: var(--shadow-sm);
 }
 
 .ui-btn--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-primary-hover) 0%, #166534 100%);
+  background: linear-gradient(135deg, #ffe566 0%, var(--color-primary) 100%);
   box-shadow: var(--shadow-glow);
 }
 
@@ -48,8 +48,8 @@
 }
 
 .ui-btn--accent:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--color-accent-hover) 0%, #9a3412 100%);
-  box-shadow: 0 0 20px rgb(249 115 22 / 0.35);
+  background: linear-gradient(135deg, var(--color-accent-hover) 0%, #9b2226 100%);
+  box-shadow: 0 0 20px rgb(230 57 70 / 0.35);
 }
 
 .ui-btn--secondary {

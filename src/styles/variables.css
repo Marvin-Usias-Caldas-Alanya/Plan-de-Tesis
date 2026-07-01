@@ -1,31 +1,33 @@
 :root {
-  /* Fondo oscuro + acentos verde / naranja / azul */
-  --color-bg: #0a0e12;
-  --color-bg-elevated: #111820;
-  --color-surface: #151d28;
-  --color-surface-hover: #1a2433;
-  --color-border: #2a3647;
-  --color-border-focus: #22c55e;
+  /* Nutriland Sport — negro, dorado y acento promo (nutrilandsport.pe) */
+  --color-bg: #0a0a0a;
+  --color-bg-elevated: #121212;
+  --color-surface: #1a1a1a;
+  --color-surface-hover: #242424;
+  --color-border: #2e2e2e;
+  --color-border-focus: #f5c518;
 
-  --color-text: #eef2f7;
-  --color-text-muted: #8fa3bc;
-  --color-heading: #f8fafc;
+  --color-text: #f5f5f5;
+  --color-text-muted: #a3a3a3;
+  --color-heading: #ffffff;
 
-  --color-primary: #22c55e;
-  --color-primary-hover: #16a34a;
-  --color-primary-muted: rgb(34 197 94 / 0.15);
+  --color-primary: #f5c518;
+  --color-primary-hover: #d4a017;
+  --color-primary-muted: rgb(245 197 24 / 0.14);
 
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-accent-muted: rgb(249 115 22 / 0.15);
+  --color-accent: #e63946;
+  --color-accent-hover: #c1121f;
+  --color-accent-muted: rgb(230 57 70 / 0.14);
 
-  --color-info: #3b82f6;
-  --color-info-muted: rgb(59 130 246 / 0.15);
+  --color-info: #38bdf8;
+  --color-info-muted: rgb(56 189 248 / 0.12);
 
   --color-danger: #ef4444;
   --color-danger-muted: rgb(239 68 68 / 0.12);
   --color-success: #22c55e;
   --color-success-muted: rgb(34 197 94 / 0.12);
+
+  --color-on-primary: #0a0a0a;
 
   --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: var(--font-sans);
@@ -36,10 +38,10 @@
   --radius-xl: 1.25rem;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.25);
-  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.35);
-  --shadow-lg: 0 16px 48px rgb(0 0 0 / 0.45);
-  --shadow-glow: 0 0 24px rgb(34 197 94 / 0.2);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 16px 48px rgb(0 0 0 / 0.55);
+  --shadow-glow: 0 0 24px rgb(245 197 24 / 0.25);
 
   --navbar-height: 4.25rem;
   --max-width: 1200px;

@@ -105,9 +105,9 @@ export default function HomePage() {
         <div className="home-hero__glow home-hero__glow--right" aria-hidden="true" />
 
         <div className="home-hero__inner">
-          <span className="home-hero__badge">Suplementos · Atención inteligente</span>
+          <span className="home-hero__badge">Líder en nutrición deportiva</span>
           <h1 id="home-hero-title" className="home-hero__title">
-            Potencia tu rendimiento con la nutrición correcta
+            Impulsando tu mejor versión
           </h1>
           <p className="home-hero__subtitle">
             En {APP_NAME} encuentras proteínas, vitaminas y más, con asesoría por chatbot
