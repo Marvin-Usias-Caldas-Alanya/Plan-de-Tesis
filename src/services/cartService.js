@@ -4,7 +4,6 @@ import {
   handleSupabaseError,
   insertOne,
   selectMany,
-  selectMaybeSingle,
   updateOne,
   updateWhere,
 } from './baseService';
@@ -50,7 +49,14 @@ export async function getActiveCartByProfileId(profileId) {
 export async function getOrCreateActiveCart(profileId) {
   const existing = await getActiveCartByProfileId(profileId);
   if (existing) return existing;
-  return createCartForProfile(profileId);
+
+  try {
+    return await createCartForProfile(profileId);
+  } catch {
+    const retry = await getActiveCartByProfileId(profileId);
+    if (retry) return retry;
+    throw new Error('[crear carrito] No se pudo obtener ni crear un carrito activo');
+  }
 }
 
 export async function getCartItems(cartId) {
@@ -89,12 +95,13 @@ export async function createCartForProfile(profileId) {
 }
 
 export async function upsertCartItem(cartId, { productId, quantity }) {
-  const existing = await selectMaybeSingle(
+  const rows = await selectMany(
     'cart_items',
     'id, quantity',
-    { eq: { cart_id: cartId, product_id: productId } },
+    { eq: { cart_id: cartId, product_id: productId }, limit: 1 },
     'buscar ítem en carrito',
   );
+  const existing = rows[0];
 
   if (existing) {
     return updateOne(

@@ -1,4 +1,5 @@
 import { selectMany } from './baseService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 export async function getErrorLogs(limit = 100) {
   const rows = await selectMany(
@@ -10,7 +11,7 @@ export async function getErrorLogs(limit = 100) {
       severity,
       context,
       created_at,
-      profiles ( full_name, email )
+      profiles ( ${PROFILE_NESTED_SELECT} )
     `,
     { order: 'created_at', ascending: false, limit },
     'listar logs de error',
@@ -21,7 +22,7 @@ export async function getErrorLogs(limit = 100) {
     error_code: row.error_code,
     message: row.message,
     severity: row.severity,
-    profile_name: row.profiles?.full_name ?? null,
+    profile_name: resolveProfileName(row.profiles),
     created_at: row.created_at,
   }));
 }

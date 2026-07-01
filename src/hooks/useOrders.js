@@ -12,7 +12,7 @@ import {
 import { getSellerIdByProfileId } from '../services/profileService';
 import { createNotification } from '../services/notificationService';
 
-export function useOrders({ mode = 'admin', profileId, onFeedback } = {}) {
+export function useOrders({ mode = 'admin', profileId, onFeedback, autoLoad = true } = {}) {
   const [orders, setOrders] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -43,8 +43,8 @@ export function useOrders({ mode = 'admin', profileId, onFeedback } = {}) {
   }, [mode, profileId, onFeedback]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (autoLoad) refresh();
+  }, [autoLoad, refresh]);
 
   const selectOrder = useCallback(async (order) => {
     setSelectedOrder(order);

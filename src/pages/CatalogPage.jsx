@@ -57,6 +57,7 @@ export default function CatalogPage() {
   const { createPurchaseOrder, submitting: orderSubmitting } = useOrders({
     mode: 'customer',
     profileId: user?.id,
+    autoLoad: false,
     onFeedback: showOrderFeedback,
   });
 

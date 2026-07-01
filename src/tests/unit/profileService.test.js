@@ -29,7 +29,7 @@ describe('profileService', () => {
   });
 
   it('getCustomerIdByProfileId', async () => {
-    const builder = createQueryBuilder({ data: { id: 'cust-1' }, error: null });
+    const builder = createQueryBuilder({ data: [{ id: 'cust-1' }], error: null });
     mockFrom.mockImplementation(createSupabaseFromMock({ customers: () => builder }));
     await expect(getCustomerIdByProfileId('u1')).resolves.toBe('cust-1');
   });

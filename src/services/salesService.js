@@ -1,4 +1,5 @@
 import { insertMany, insertOne, selectMany, selectMaybeSingle } from './baseService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 const SALE_SELECT = `
   id,
@@ -8,7 +9,7 @@ const SALE_SELECT = `
   total_amount,
   sale_date,
   created_at,
-  customers ( profiles ( full_name, email ) )
+  customers ( profiles ( ${PROFILE_NESTED_SELECT} ) )
 `;
 
 export function mapSale(row) {
@@ -18,7 +19,7 @@ export function mapSale(row) {
     sale_number: row.sale_number,
     order_id: row.order_id,
     customer_id: row.customer_id,
-    customer_name: row.customers?.profiles?.full_name ?? null,
+    customer_name: resolveProfileName(row.customers?.profiles),
     total_amount: Number(row.total_amount),
     sale_date: row.sale_date,
     created_at: row.created_at,

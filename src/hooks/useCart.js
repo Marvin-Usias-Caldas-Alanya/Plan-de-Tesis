@@ -42,7 +42,7 @@ export function useCart(profileId) {
 
   const addProduct = useCallback(
     async (product, quantity = 1) => {
-      if (!profileId || !cartId) {
+      if (!profileId) {
         throw new Error('Debes iniciar sesión para agregar al carrito');
       }
       if (product.stock <= 0) {
@@ -52,7 +52,13 @@ export function useCart(profileId) {
       setSubmitting(true);
       setError(null);
       try {
-        await upsertCartItem(cartId, { productId: product.id, quantity });
+        let activeCartId = cartId;
+        if (!activeCartId) {
+          const cart = await getOrCreateActiveCart(profileId);
+          activeCartId = cart.id;
+          setCartId(activeCartId);
+        }
+        await upsertCartItem(activeCartId, { productId: product.id, quantity });
         await refresh();
         return true;
       } catch (err) {

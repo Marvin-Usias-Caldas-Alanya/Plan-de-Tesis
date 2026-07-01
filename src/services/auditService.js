@@ -1,4 +1,5 @@
 import { selectMany } from './baseService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 export async function getAuditLogs(limit = 100) {
   const rows = await selectMany(
@@ -10,7 +11,7 @@ export async function getAuditLogs(limit = 100) {
       record_id,
       payload,
       created_at,
-      profiles ( full_name, email )
+      profiles ( ${PROFILE_NESTED_SELECT} )
     `,
     { order: 'created_at', ascending: false, limit },
     'logs de auditoría',
@@ -21,7 +22,7 @@ export async function getAuditLogs(limit = 100) {
     action: row.action,
     table_name: row.table_name,
     record_id: row.record_id,
-    profile_name: row.profiles?.full_name ?? 'Sistema',
+    profile_name: resolveProfileName(row.profiles) ?? 'Sistema',
     created_at: row.created_at,
   }));
 }

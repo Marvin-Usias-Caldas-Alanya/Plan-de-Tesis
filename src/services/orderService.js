@@ -17,6 +17,7 @@ import { getCustomerIdByProfileId } from './profileService';
 import { createPayment } from './paymentService';
 import { createSaleFromOrder } from './salesService';
 import { decreaseStock } from './productService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 const ORDER_SELECT = `
   id,
@@ -30,7 +31,8 @@ const ORDER_SELECT = `
   updated_at,
   order_statuses ( code, name ),
   customers (
-    profiles ( full_name, email )
+    profile_id,
+    profiles ( ${PROFILE_NESTED_SELECT} )
   )
 `;
 
@@ -41,7 +43,7 @@ export function mapOrder(row) {
     id: row.id,
     order_number: row.order_number,
     customer_id: row.customer_id,
-    customer_name: profile?.full_name ?? null,
+    customer_name: resolveProfileName(profile),
     customer_email: profile?.email ?? null,
     status_id: row.status_id,
     status_code: row.order_statuses?.code ?? null,
@@ -90,7 +92,17 @@ export async function getOrdersByCustomerProfile(profileId) {
 }
 
 export async function getOrdersForSeller(profileId) {
-  const seller = await selectSingle('sellers', 'id', { eq: { profile_id: profileId } }, 'vendedor');
+  const rows = await selectMany(
+    'sellers',
+    'id',
+    { eq: { profile_id: profileId }, limit: 1 },
+    'vendedor',
+  );
+  const seller = rows[0];
+  if (!seller) {
+    throw new Error('[pedidos del vendedor] No existe fila en sellers');
+  }
+
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('orders')

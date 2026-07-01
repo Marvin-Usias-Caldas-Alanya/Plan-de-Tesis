@@ -1,10 +1,10 @@
 import {
   insertOne,
   selectMany,
-  selectMaybeSingle,
   selectSingle,
   updateOne,
 } from './baseService';
+import { normalizeProfileRow, resolveProfileName } from '../utils/profileFields';
 
 const PROFILE_SELECT = `
   id,
@@ -19,62 +19,69 @@ const PROFILE_SELECT = `
   roles ( id, code, name )
 `;
 
-const PROFILE_LEGACY_SELECT = `
-  id,
-  email,
-  full_name,
-  phone,
-  avatar_url,
-  is_active,
-  role,
-  created_at,
-  updated_at
-`;
+const PROFILE_LEGACY_SELECTS = [
+  'id, email, full_name, phone, avatar_url, is_active, role, created_at, updated_at',
+  'id, email, nombre, phone, is_active, role, created_at, updated_at',
+  'id, email, name, is_active, role, created_at, updated_at',
+  'id, email, role, created_at, updated_at',
+];
 
 export function mapProfile(row) {
-  if (!row) return null;
+  const normalized = normalizeProfileRow(row);
+  if (!normalized) return null;
   return {
-    id: row.id,
-    email: row.email,
-    full_name: row.full_name,
-    phone: row.phone,
-    avatar_url: row.avatar_url,
-    is_active: row.is_active,
-    role_id: row.role_id ?? null,
-    role_code: row.roles?.code ?? row.role ?? null,
-    role_name: row.roles?.name ?? row.role ?? null,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    id: normalized.id,
+    email: normalized.email,
+    full_name: normalized.full_name,
+    phone: normalized.phone ?? null,
+    avatar_url: normalized.avatar_url ?? null,
+    is_active: normalized.is_active ?? true,
+    role_id: normalized.role_id ?? null,
+    role_code: normalized.roles?.code ?? normalized.role ?? null,
+    role_name: normalized.roles?.name ?? normalized.role ?? null,
+    created_at: normalized.created_at,
+    updated_at: normalized.updated_at,
   };
 }
 
-export async function getAllProfiles() {
-  const rows = await selectMany(
-    'profiles',
-    PROFILE_SELECT,
-    { order: 'full_name' },
-    'listar perfiles',
-  );
-  return rows.map(mapProfile);
+async function fetchProfileRow(profileId, select, context) {
+  return selectSingle('profiles', select, { eq: { id: profileId } }, context);
 }
 
 export async function getProfileById(profileId) {
   try {
-    const row = await selectSingle(
-      'profiles',
-      PROFILE_SELECT,
-      { eq: { id: profileId } },
-      'obtener perfil',
-    );
+    const row = await fetchProfileRow(profileId, PROFILE_SELECT, 'obtener perfil');
     return mapProfile(row);
   } catch {
-    const row = await selectSingle(
+    for (const select of PROFILE_LEGACY_SELECTS) {
+      try {
+        const row = await fetchProfileRow(profileId, select, 'obtener perfil legacy');
+        return mapProfile(row);
+      } catch {
+        /* siguiente variante */
+      }
+    }
+    throw new Error('[obtener perfil] No se pudo leer el perfil del usuario');
+  }
+}
+
+export async function getAllProfiles() {
+  try {
+    const rows = await selectMany(
       'profiles',
-      PROFILE_LEGACY_SELECT,
-      { eq: { id: profileId } },
-      'obtener perfil legacy',
+      PROFILE_SELECT,
+      { order: 'email' },
+      'listar perfiles',
     );
-    return mapProfile(row);
+    return rows.map(mapProfile);
+  } catch {
+    const rows = await selectMany(
+      'profiles',
+      'id, email, role, created_at, updated_at',
+      { order: 'email' },
+      'listar perfiles legacy',
+    );
+    return rows.map(mapProfile);
   }
 }
 
@@ -96,25 +103,42 @@ export async function updateProfile(profileId, { full_name, phone }) {
   if (full_name !== undefined) payload.full_name = full_name;
   if (phone !== undefined) payload.phone = phone;
 
-  const row = await updateOne(
-    'profiles',
-    profileId,
-    payload,
-    PROFILE_SELECT,
-    'actualizar perfil',
-  );
-  return mapProfile(row);
+  try {
+    const row = await updateOne(
+      'profiles',
+      profileId,
+      payload,
+      PROFILE_SELECT,
+      'actualizar perfil',
+    );
+    return mapProfile(row);
+  } catch {
+    const legacyPayload = {};
+    if (full_name !== undefined) {
+      legacyPayload.nombre = full_name;
+      legacyPayload.name = full_name;
+    }
+    if (phone !== undefined) legacyPayload.phone = phone;
+    const row = await updateOne(
+      'profiles',
+      profileId,
+      legacyPayload,
+      'id, email, nombre, name, phone, role, created_at, updated_at',
+      'actualizar perfil legacy',
+    );
+    return mapProfile(row);
+  }
 }
 
 async function ensureRoleEntities(profileId, roleCode) {
   if (roleCode === 'seller') {
-    const existing = await selectMaybeSingle(
+    const rows = await selectMany(
       'sellers',
       'id',
       { eq: { profile_id: profileId } },
       'verificar vendedor',
     );
-    if (!existing) {
+    if (!rows.length) {
       await insertOne(
         'sellers',
         { profile_id: profileId, is_available: true },
@@ -125,26 +149,19 @@ async function ensureRoleEntities(profileId, roleCode) {
   }
 
   if (roleCode === 'customer') {
-    const existing = await selectMaybeSingle(
-      'customers',
-      'id',
-      { eq: { profile_id: profileId } },
-      'verificar cliente',
-    );
-    if (!existing) {
-      await createCustomerForProfile(profileId);
-    }
+    await getCustomerIdByProfileId(profileId);
   }
 }
 
 export async function getSellerAvailability(profileId) {
-  const row = await selectSingle(
+  const rows = await selectMany(
     'sellers',
     'is_available',
     { eq: { profile_id: profileId } },
     'disponibilidad del vendedor',
   );
-  return row.is_available;
+  if (!rows.length) return true;
+  return rows[0].is_available;
 }
 
 export async function updateSellerAvailability(profileId, isAvailable) {
@@ -160,37 +177,54 @@ export async function updateSellerAvailability(profileId, isAvailable) {
 }
 
 export async function setProfileActive(profileId, isActive) {
-  const row = await updateOne(
-    'profiles',
-    profileId,
-    { is_active: isActive },
-    PROFILE_SELECT,
-    'activar/desactivar perfil',
-  );
-  return mapProfile(row);
+  try {
+    const row = await updateOne(
+      'profiles',
+      profileId,
+      { is_active: isActive },
+      PROFILE_SELECT,
+      'activar/desactivar perfil',
+    );
+    return mapProfile(row);
+  } catch {
+    const row = await updateOne(
+      'profiles',
+      profileId,
+      { is_active: isActive },
+      'id, email, role, is_active',
+      'activar/desactivar perfil legacy',
+    );
+    return mapProfile(row);
+  }
 }
 
 export async function getCustomerIdByProfileId(profileId) {
-  const row = await selectMaybeSingle(
+  const rows = await selectMany(
     'customers',
-    'id',
-    { eq: { profile_id: profileId } },
+    'id, created_at',
+    { eq: { profile_id: profileId }, order: 'created_at', ascending: false },
     'obtener cliente por perfil',
   );
-  if (row?.id) return row.id;
 
-  const created = await createCustomerForProfile(profileId);
-  return created.id;
+  if (!rows.length) {
+    const created = await createCustomerForProfile(profileId);
+    return created.id;
+  }
+
+  return rows[0].id;
 }
 
 export async function getSellerIdByProfileId(profileId) {
-  const row = await selectSingle(
+  const rows = await selectMany(
     'sellers',
     'id',
     { eq: { profile_id: profileId } },
     'obtener vendedor por perfil',
   );
-  return row.id;
+  if (!rows.length) {
+    throw new Error('[obtener vendedor por perfil] No existe fila en sellers');
+  }
+  return rows[0].id;
 }
 
 export async function getAllCustomers() {
@@ -201,7 +235,7 @@ export async function getAllCustomers() {
       document_id,
       loyalty_points,
       created_at,
-      profiles ( id, email, full_name, is_active, roles ( code, name ) )
+      profiles ( id, email, role )
     `,
     { order: 'created_at', ascending: false },
     'listar clientes',
@@ -213,9 +247,9 @@ export async function getAllCustomers() {
     loyalty_points: row.loyalty_points,
     profile_id: row.profiles?.id,
     email: row.profiles?.email,
-    full_name: row.profiles?.full_name,
-    is_active: row.profiles?.is_active,
-    role_code: row.profiles?.roles?.code,
+    full_name: resolveProfileName(row.profiles),
+    is_active: row.profiles?.is_active ?? true,
+    role_code: row.profiles?.role ?? null,
     created_at: row.created_at,
   }));
 }
@@ -228,7 +262,7 @@ export async function getAllSellers() {
       employee_code,
       is_available,
       created_at,
-      profiles ( id, email, full_name, is_active, roles ( code, name ) )
+      profiles ( id, email, role )
     `,
     { order: 'created_at', ascending: false },
     'listar vendedores',
@@ -240,8 +274,8 @@ export async function getAllSellers() {
     is_available: row.is_available,
     profile_id: row.profiles?.id,
     email: row.profiles?.email,
-    full_name: row.profiles?.full_name,
-    is_active: row.profiles?.is_active,
+    full_name: resolveProfileName(row.profiles),
+    is_active: row.profiles?.is_active ?? true,
     created_at: row.created_at,
   }));
 }

@@ -1,4 +1,5 @@
 import { selectMany } from './baseService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 export async function getSupportTickets() {
   const rows = await selectMany(
@@ -9,7 +10,7 @@ export async function getSupportTickets() {
       subject,
       status,
       created_at,
-      customers ( profiles ( full_name, email ) )
+      customers ( profiles ( ${PROFILE_NESTED_SELECT} ) )
     `,
     { order: 'created_at', ascending: false },
     'listar tickets',
@@ -20,7 +21,7 @@ export async function getSupportTickets() {
     ticket_number: row.ticket_number,
     subject: row.subject,
     status: row.status,
-    customer_name: row.customers?.profiles?.full_name ?? null,
+    customer_name: resolveProfileName(row.customers?.profiles),
     customer_email: row.customers?.profiles?.email ?? null,
     created_at: row.created_at,
   }));

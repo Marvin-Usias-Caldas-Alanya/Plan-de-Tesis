@@ -1,4 +1,5 @@
 import { getSupabaseClient, handleSupabaseError, insertOne, selectMany, updateOne, updateWhere } from './baseService';
+import { PROFILE_NESTED_SELECT, resolveProfileName } from '../utils/profileFields';
 
 export function mapNotification(row) {
   if (!row) return null;
@@ -39,7 +40,7 @@ export async function getAllNotifications(limit = 100) {
       type,
       is_read,
       created_at,
-      profiles ( full_name, email )
+      profiles ( ${PROFILE_NESTED_SELECT} )
     `,
     { order: 'created_at', ascending: false, limit },
     'notificaciones admin',
@@ -51,7 +52,7 @@ export async function getAllNotifications(limit = 100) {
     body: row.body,
     type: row.type,
     is_read: row.is_read,
-    profile_name: row.profiles?.full_name ?? null,
+    profile_name: resolveProfileName(row.profiles),
     created_at: row.created_at,
   }));
 }
