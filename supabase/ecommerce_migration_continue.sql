@@ -1,9 +1,11 @@
 -- =============================================================================
--- NutriStore — E-commerce completo (catálogos + carrito + pedidos + RLS)
+-- Nutriland Sport — E-commerce completo (catálogos + carrito + pedidos + RLS)
 -- Ejecutar en Supabase SQL Editor → Run and enable RLS
--- Requiere: profiles + fix_catalog_schema.sql (products, customers)
+-- Orden recomendado: fix_catalog_schema.sql → este archivo → fix_data_issues.sql
 -- Seguro de re-ejecutar (IF NOT EXISTS)
 -- =============================================================================
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- --- Catálogos de pedidos y pagos ---
 CREATE TABLE IF NOT EXISTS public.roles (
@@ -53,6 +55,14 @@ INSERT INTO public.payment_methods (code, name) VALUES
   ('transfer', 'Transferencia'),
   ('mercadopago', 'Mercado Pago')
 ON CONFLICT (code) DO NOTHING;
+
+CREATE OR REPLACE FUNCTION public.default_customer_role_id()
+RETURNS UUID
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT id FROM public.roles WHERE code = 'customer' LIMIT 1;
+$$;
 
 -- --- Funciones RLS (profiles.role o profiles.role_id) ---
 DO $$
@@ -286,3 +296,80 @@ CREATE POLICY "products_stock_staff" ON public.products FOR UPDATE TO authentica
 DROP POLICY IF EXISTS "sellers_update_own" ON public.sellers;
 CREATE POLICY "sellers_update_own" ON public.sellers FOR UPDATE TO authenticated
   USING (profile_id = auth.uid()) WITH CHECK (profile_id = auth.uid());
+
+-- --- Trigger: perfil + customers al registrar usuario ---
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'role_id'
+  ) THEN
+    EXECUTE $sql$
+      CREATE OR REPLACE FUNCTION public.handle_new_user()
+      RETURNS TRIGGER
+      LANGUAGE plpgsql
+      SECURITY DEFINER
+      SET search_path = public
+      AS $fn$
+      BEGIN
+        INSERT INTO public.profiles (id, email, full_name, role_id)
+        VALUES (
+          NEW.id,
+          NEW.email,
+          COALESCE(NEW.raw_user_meta_data ->> 'full_name', ''),
+          public.default_customer_role_id()
+        )
+        ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
+
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'customers'
+        ) THEN
+          INSERT INTO public.customers (profile_id)
+          VALUES (NEW.id)
+          ON CONFLICT (profile_id) DO NOTHING;
+        END IF;
+
+        RETURN NEW;
+      END;
+      $fn$;
+    $sql$;
+  ELSE
+    EXECUTE $sql$
+      CREATE OR REPLACE FUNCTION public.handle_new_user()
+      RETURNS TRIGGER
+      LANGUAGE plpgsql
+      SECURITY DEFINER
+      SET search_path = public
+      AS $fn$
+      BEGIN
+        INSERT INTO public.profiles (id, email, nombre, role)
+        VALUES (
+          NEW.id,
+          NEW.email,
+          COALESCE(NEW.raw_user_meta_data ->> 'full_name', ''),
+          'customer'
+        )
+        ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
+
+        IF EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = 'public' AND table_name = 'customers'
+        ) THEN
+          INSERT INTO public.customers (profile_id)
+          VALUES (NEW.id)
+          ON CONFLICT (profile_id) DO NOTHING;
+        END IF;
+
+        RETURN NEW;
+      END;
+      $fn$;
+    $sql$;
+  END IF;
+END $$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_new_user();
